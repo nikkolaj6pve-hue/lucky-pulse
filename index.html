@@ -1,517 +1,273 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lucky Pulse: Evolution PRO+</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg: #05050a;
-            --panel: rgba(255, 255, 255, 0.05);
-            --accent: #00f2ff;
-            --accent-dark: #0088ff;
-            --gold: #ffcc00;
-            --prestige: #a020f0;
-            --text: #ffffff;
-            --green: #00ffa3;
-            --red: #ff3e3e;
-            --energy: #ffea00;
-            --exp: #8e44ad;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'SF Pro Display', -apple-system, sans-serif;
-            overflow: hidden; 
-            height: 100vh;
-        }
-
-        #loader {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10000; transition: 0.5s;
-        }
-        .loader-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; }
-        #loader-fill { height: 100%; width: 0%; background: var(--accent); transition: 0.3s; }
-
-        #app { 
-            display: none; 
-            flex-direction: column; 
-            height: 100vh; 
-            padding: 15px; 
-            background: radial-gradient(circle at 50% -20%, #1a1a35, #05050a);
-        }
-
-        .glass { 
-            background: var(--panel); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            border-radius: 20px; 
-            padding: 15px; 
-            margin-bottom: 12px; 
-        }
-
-        .balance-main { 
-            font-size: 42px; 
-            font-weight: 900; 
-            text-align: center;
-            background: linear-gradient(to bottom, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 5px 0;
-        }
-
-        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 8px 0; overflow: hidden; }
-        .progress-fill { height: 100%; transition: width 0.3s ease; }
-
-        .item-row { 
-            display: flex; align-items: center; gap: 12px; padding: 12px; 
-            background: rgba(255,255,255,0.03); border-radius: 18px; margin-bottom: 10px; 
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.2s;
-        }
-        .item-row:active { transform: scale(0.98); background: rgba(255,255,255,0.07); }
-
-        .tab-bar { 
-            position: fixed; bottom: 15px; left: 10px; right: 10px; 
-            height: 65px; background: rgba(15,15,25,0.95); 
-            backdrop-filter: blur(15px); border-radius: 20px; 
-            display: flex; justify-content: space-around; align-items: center; 
-            border: 1px solid rgba(255,255,255,0.1); z-index: 1000;
-        }
-        .tab { opacity: 0.4; text-align: center; font-size: 9px; transition: 0.2s; cursor: pointer; }
-        .tab.active { opacity: 1; color: var(--accent); }
-        .tab i { font-size: 20px; display: block; margin-bottom: 2px; font-style: normal; }
-
-        .screen { display: none; height: calc(100vh - 120px); overflow-y: auto; padding-bottom: 20px; }
-        .screen.active { display: block; animation: slideUp 0.3s ease-out; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .btn-action { 
-            border: none; padding: 12px; border-radius: 12px; color: #fff; 
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-            background: linear-gradient(45deg, var(--accent-dark), var(--accent));
-        }
-        .btn-action:active { transform: scale(0.95); }
-        .btn-action:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        .level-badge {
-            background: var(--exp);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-120px); opacity: 0; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lucky Pulse: Evolution PRO+</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+    --bg: #05050a;
+    --panel: rgba(255,255,255,0.05);
+    --accent: #00f2ff;
+    --accent-dark: #0088ff;
+    --gold: #ffcc00;
+    --prestige: #a020f0;
+    --text: #ffffff;
+    --green: #00ffa3;
+    --red: #ff3e3e;
+    --energy: #ffea00;
+    --exp: #8e44ad;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'SF Pro Display',-apple-system,sans-serif;overflow:hidden;height:100vh;}
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;transition:0.5s;}
+.loader-bar{width:200px;height:4px;background:rgba(255,255,255,0.1);border-radius:10px;margin-top:20px;overflow:hidden;}
+#loader-fill{height:100%;width:0%;background:var(--accent);transition:0.3s;}
+#app{display:none;flex-direction:column;height:100vh;padding:15px;background:radial-gradient(circle at 50% -20%, #1a1a35, #05050a);}
+.glass{background:var(--panel);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:15px;margin-bottom:12px;}
+.balance-main{font-size:42px;font-weight:900;text-align:center;background:linear-gradient(to bottom,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:5px 0;}
+.progress-container{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;margin:8px 0;overflow:hidden;}
+.progress-fill{height:100%;transition:width 0.3s ease;}
+.item-row{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:18px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05);transition:0.2s;}
+.item-row:active{transform:scale(0.98);background:rgba(255,255,255,0.07);}
+.tab-bar{position:fixed;bottom:15px;left:10px;right:10px;height:65px;background:rgba(15,15,25,0.95);backdrop-filter:blur(15px);border-radius:20px;display:flex;justify-content:space-around;align-items:center;border:1px solid rgba(255,255,255,0.1);z-index:1000;}
+.tab{opacity:0.4;text-align:center;font-size:9px;transition:0.2s;cursor:pointer;}
+.tab.active{opacity:1;color:var(--accent);}
+.tab i{font-size:20px;display:block;margin-bottom:2px;font-style:normal;}
+.screen{display:none;height:calc(100vh - 120px);overflow-y:auto;padding-bottom:20px;}
+.screen.active{display:block;animation:slideUp 0.3s ease-out;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.btn-action{border:none;padding:12px;border-radius:12px;color:#fff;font-weight:bold;cursor:pointer;transition:0.2s;background:linear-gradient(45deg,var(--accent-dark),var(--accent));}
+.btn-action:active{transform:scale(0.95);}
+.btn-action:disabled{opacity:0.3;cursor:not-allowed;}
+.level-badge{background:var(--exp);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:bold;}
+@keyframes floatUp{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-120px);opacity:0;}}
+</style>
 </head>
 <body>
+<div id="loader">
+<h1 style="letter-spacing:5px;color:var(--accent)">LUCKY PULSE</h1>
+<div id="loader-status" style="font-size:10px;opacity:0.6;">RESTORING SESSION...</div>
+<div class="loader-bar"><div id="loader-fill"></div></div>
+</div>
 
-    <div id="loader">
-        <h1 style="letter-spacing: 5px; color: var(--accent)">LUCKY PULSE</h1>
-        <div id="loader-status" style="font-size: 10px; opacity: 0.6;">RESTORING SESSION...</div>
-        <div class="loader-bar"><div id="loader-fill"></div></div>
-    </div>
+<div id="app">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+<div>
+<span class="level-badge">LVL <span id="lvl-txt">1</span></span>
+<div style="font-size:10px;margin-top:4px;opacity:0.8;">EXP: <span id="exp-val">0</span>/<span id="exp-next">150</span></div>
+</div>
+<div class="glass" style="margin:0;padding:5px 15px;border-radius:15px;display:flex;align-items:center;gap:8px;">
+<span style="color:var(--gold)">💎</span>
+<span id="stones-txt" style="font-weight:bold;">0</span>
+</div>
+</div>
 
-    <div id="app">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <div>
-                <span class="level-badge">LVL <span id="lvl-txt">1</span></span>
-                <div style="font-size: 10px; margin-top: 4px; opacity: 0.8;">EXP: <span id="exp-val">0</span>/<span id="exp-next">150</span></div>
-            </div>
-            <div class="glass" style="margin:0; padding:5px 15px; border-radius:15px; display:flex; align-items:center; gap:8px;">
-                <span style="color:var(--gold)">💎</span>
-                <span id="stones-txt" style="font-weight:bold;">0</span>
-            </div>
-        </div>
+<div id="sc-home" class="screen active">
+<div class="glass" onclick="handleTap(event)" style="cursor:pointer;position: relative; overflow:hidden;text-align:center;">
+<div style="font-size:10px;opacity:0.5;letter-spacing:2px;">CASH BALANCE</div>
+<div class="balance-main">$<span id="bal-txt">0</span></div>
+<div style="display:flex;justify-content:center;gap:20px;font-size:13px;margin-top:10px;">
+<span style="color:var(--green)">+$<span id="inc-txt">0</span>/s</span>
+<span style="color:var(--accent)">⚡ <span id="pwr-txt">1</span></span>
+</div>
+<div class="progress-container"><div id="energy-bar" class="progress-fill" style="background:var(--energy)"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:10px;opacity:0.6;">
+<span>ENERGY</span>
+<span><span id="energy-num">1000</span> / <span id="max-energy-num">1000</span></span>
+</div>
+</div>
 
-        <div id="sc-home" class="screen active">
-            <div class="glass" onclick="handleTap(event)" style="cursor:pointer; position: relative; overflow: hidden; text-align: center;">
-                <div style="font-size:10px; opacity:0.5; letter-spacing:2px;">CASH BALANCE</div>
-                <div class="balance-main">$<span id="bal-txt">0</span></div>
-                
-                <div style="display:flex; justify-content:center; gap:20px; font-size:13px; margin-top:10px;">
-                    <span style="color:var(--green)">+$<span id="inc-txt">0</span>/s</span>
-                    <span style="color:var(--accent)">⚡ <span id="pwr-txt">1</span></span>
-                </div>
+<div class="glass" style="background: rgba(0, 242, 255, 0.05);">
+<div style="font-size:12px;margin-bottom:10px;color:var(--gold);display:flex;align-items:center;gap:5px;">
+<span>🏦</span> CENTRAL BANK (Lvl <span id="bank-lvl-txt">1</span>)
+</div>
+<div style="font-size:24px;font-weight:bold;margin-bottom:5px;">$ <span id="dep-txt">0</span></div>
+<div style="font-size:10px;color: var(--green);margin-bottom: 10px;">Rate: <span id="bank-rate-txt">0.05</span>% / tick</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+<button onclick="bankAction('dep')" class="btn-action" style="font-size:11px;">DEPOSIT ALL</button>
+<button onclick="bankAction('wit')" class="btn-action" style="background:transparent;border:1px solid var(--accent);font-size:11px;">WITHDRAW</button>
+</div>
+<button onclick="upgradeBank()" id="bank-up-btn" class="btn-action" style="width:100%;margin-top:10px;background:var(--prestige);font-size:11px;">UPGRADE BANK ($<span id="bank-up-cost">5000</span>)</button>
+</div>
+</div>
 
-                <div class="progress-container"><div id="energy-bar" class="progress-fill" style="background:var(--energy)"></div></div>
-                <div style="display:flex; justify-content:space-between; font-size:10px; opacity:0.6;">
-                    <span>ENERGY</span>
-                    <span><span id="energy-num">1000</span> / <span id="max-energy-num">1000</span></span>
-                </div>
-            </div>
+<div id="sc-assets" class="screen">
+<h3 style="margin:0 0 15px 5px;">Business Empire</h3>
+<div id="biz-list"></div>
+</div>
 
-            <div class="glass" style="background: rgba(0, 242, 255, 0.05);">
-                <div style="font-size:12px; margin-bottom:10px; color:var(--gold); display:flex; align-items:center; gap:5px;">
-                    <span>🏦</span> CENTRAL BANK (Lvl <span id="bank-lvl-txt">1</span>)
-                </div>
-                <div style="font-size:24px; font-weight:bold; margin-bottom:5px;">$ <span id="dep-txt">0</span></div>
-                <div style="font-size:10px; color: var(--green); margin-bottom: 10px;">Rate: <span id="bank-rate-txt">0.05</span>% / tick</div>
-                
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button onclick="bankAction('dep')" class="btn-action" style="font-size:11px;">DEPOSIT ALL</button>
-                    <button onclick="bankAction('wit')" class="btn-action" style="background:transparent; border:1px solid var(--accent); font-size:11px;">WITHDRAW</button>
-                </div>
-                <button onclick="upgradeBank()" id="bank-up-btn" class="btn-action" style="width:100%; margin-top:10px; background:var(--prestige); font-size:11px;">
-                    UPGRADE BANK ($<span id="bank-up-cost">5000</span>)
-                </button>
-            </div>
-        </div>
+<div id="sc-market" class="screen">
+<h3 style="margin:0 0 15px 5px;">Stock Exchange</h3>
+<div id="stock-list"></div>
+</div>
 
-        <div id="sc-assets" class="screen">
-            <h3 style="margin: 0 0 15px 5px;">Business Empire</h3>
-            <div id="biz-list"></div>
-        </div>
+<div id="sc-casino" class="screen">
+<h3 style="margin:0 0 15px 5px;">High Stakes</h3>
+<div class="glass" style="text-align:center;padding:30px 15px;">
+<div id="casino-res" style="font-size:80px;margin-bottom:20px;">🎰</div>
+<input type="number" id="bet-amt" style="width:100%;padding:15px;background:#000;border:1px solid var(--accent);color:#fff;border-radius:12px;margin-bottom:15px;text-align:center;font-size:18px;" placeholder="Bet Amount">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+<button onclick="playCasino('red')" class="btn-action" style="background:var(--red);height:50px;">RED x2</button>
+<button onclick="playCasino('black')" class="btn-action" style="background:#111;border:1px solid #fff;height:50px;">BLACK x2</button>
+</div>
+</div>
+</div>
 
-        <div id="sc-market" class="screen">
-            <h3 style="margin: 0 0 15px 5px;">Stock Exchange</h3>
-            <div id="stock-list"></div>
-        </div>
+<div id="sc-rank" class="screen">
+<h3 style="margin:0 0 15px 5px;">World Ranking</h3>
+<div class="glass" style="text-align:center;border:1px solid var(--gold);padding:30px 15px;">
+<div id="rank-icon" style="font-size:60px;margin-bottom:10px;">👤</div>
+<div id="rank-name" style="font-size:26px;font-weight:bold;color:var(--gold);letter-spacing:1px;">HUSTLER</div>
+<div style="font-size:11px;opacity:0.5;margin-top:5px;">Based on Total Career Wealth</div>
+<div class="progress-container" style="height:12px;margin-top:25px;">
+<div id="rank-progress" class="progress-fill" style="background: var(--gold); width:0%"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:10px;margin-top:8px;">
+<span id="rank-curr-val">$0</span>
+<span id="rank-next-name">Next: Entrepreneur</span>
+</div>
+</div>
+</div>
 
-        <div id="sc-casino" class="screen">
-            <h3 style="margin: 0 0 15px 5px;">High Stakes</h3>
-            <div class="glass" style="text-align:center; padding: 30px 15px;">
-                <div id="casino-res" style="font-size:80px; margin-bottom:20px;">🎰</div>
-                <input type="number" id="bet-amt" style="width: 100%; padding: 15px; background: #000; border: 1px solid var(--accent); color: #fff; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 18px;" placeholder="Bet Amount">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                    <button onclick="playCasino('red')" class="btn-action" style="background:var(--red); height: 50px;">RED x2</button>
-                    <button onclick="playCasino('black')" class="btn-action" style="background:#111; border:1px solid #fff; height: 50px;">BLACK x2</button>
-                </div>
-            </div>
-        </div>
+<nav class="tab-bar">
+<div class="tab active" onclick="switchTab('home', this)"><i>🏠</i>HOME</div>
+<div class="tab" onclick="switchTab('assets', this)"><i>💼</i>BIZ</div>
+<div class="tab" onclick="switchTab('market', this)"><i>📈</i>TRADE</div>
+<div class="tab" onclick="switchTab('casino', this)"><i>🎲</i>PLAY</div>
+<div class="tab" onclick="switchTab('rank', this)"><i>🏆</i>RANK</div>
+</nav>
 
-        <div id="sc-rank" class="screen">
-            <h3 style="margin: 0 0 15px 5px;">World Ranking</h3>
-            <div class="glass" style="text-align: center; border: 1px solid var(--gold); padding: 30px 15px;">
-                <div id="rank-icon" style="font-size: 60px; margin-bottom: 10px;">👤</div>
-                <div id="rank-name" style="font-size: 26px; font-weight: bold; color: var(--gold); letter-spacing: 1px;">HUSTLER</div>
-                <div style="font-size: 11px; opacity: 0.5; margin-top: 5px;">Based on Total Career Wealth</div>
-                
-                <div class="progress-container" style="height: 12px; margin-top: 25px;">
-                    <div id="rank-progress" class="progress-fill" style="background: var(--gold); width: 0%"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 10px; margin-top: 8px;">
-                    <span id="rank-curr-val">$0</span>
-                    <span id="rank-next-name">Next: Entrepreneur</span>
-                </div>
-            </div>
-        </div>
+<script>
+// === TELEGRAM ===
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-        <nav class="tab-bar">
-            <div class="tab active" onclick="switchTab('home', this)"><i>🏠</i>HOME</div>
-            <div class="tab" onclick="switchTab('assets', this)"><i>💼</i>BIZ</div>
-            <div class="tab" onclick="switchTab('market', this)"><i>📈</i>TRADE</div>
-            <div class="tab" onclick="switchTab('casino', this)"><i>🎲</i>PLAY</div>
-            <div class="tab" onclick="switchTab('rank', this)"><i>🏆</i>RANK</div>
-        </nav>
-    </div>
+// === STATE ===
+const RANKS = [
+    { name:"HUSTLER", min:0, icon:"👤" },
+    { name:"ENTREPRENEUR", min:50000, icon:"💼" },
+    { name:"MILLIONAIRE", min:1000000, icon:"💎" },
+    { name:"POLITICIAN", min:50000000, icon:"🏛️" },
+    { name:"OLIGARCH", min:1000000000, icon:"💰" },
+    { name:"WORLD EMPEROR", min:100000000000, icon:"👑" }
+];
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+let state={
+bal:100,totalEarned:100,stones:0,energy:1000,maxEnergy:1000,
+dep:0,bankLvl:1,exp:0,lvl:1,lastTime:Date.now(),
+biz:[
+{id:0,name:"Coffee Point",cost:50,profit:1,lv:0,icon:"☕"},
+{id:1,name:"Cyber Club",cost:500,profit:12,lv:0,icon:"🌐"},
+{id:2,name:"AI Startup",cost:5000,profit:90,lv:0,icon:"🤖"},
+{id:3,name:"Crypto Farm",cost:50000,profit:750,lv:0,icon:"⛏️"},
+{id:4,name:"Rocket Corp",cost:250000,profit:4200,lv:0,icon:"🚀"}
+],
+stocks:[
+{id:0,name:"TON",price:5.4,owned:0},
+{id:1,name:"BTC",price:64000,owned:0},
+{id:2,name:"NVDA",price:120,owned:0},
+{id:3,name:"GOLD",price:2300,owned:0}
+]
+};
 
-        const RANKS = [
-            { name: "HUSTLER", min: 0, icon: "👤" },
-            { name: "ENTREPRENEUR", min: 50000, icon: "💼" },
-            { name: "MILLIONAIRE", min: 1000000, icon: "💎" },
-            { name: "POLITICIAN", min: 50000000, icon: "🏛️" },
-            { name: "OLIGARCH", min: 1000000000, icon: "💰" },
-            { name: "WORLD EMPEROR", min: 100000000000, icon: "👑" }
-        ];
+// === SAVE / LOAD ===
+function saveGame(){state.lastTime=Date.now();localStorage.setItem("lp_save_final",JSON.stringify(state));}
+function loadGame(){
+let saved=localStorage.getItem("lp_save_final");
+if(saved){
+const loaded=JSON.parse(saved);
+state={...state,...loaded};
+const diff=Math.floor((Date.now()-state.lastTime)/1000);
+if(diff>0){
+const offlineMoney=calculateIncome()*diff;
+const bankIncome=state.dep*(0.0001+state.bankLvl*0.0001)*diff;
+state.bal+=offlineMoney+bankIncome;
+state.totalEarned+=offlineMoney+bankIncome;
+state.energy=Math.min(state.maxEnergy,state.energy+(0.4+state.lvl/10)*10*diff);
+if(offlineMoney>1)setTimeout(()=>tg.showAlert(`Welcome back!\nPassive earnings: $${Math.floor(offlineMoney+bankIncome).toLocaleString()}`),1000);
+}}
+}
 
-        let state = {
-            bal: 100, totalEarned: 100, stones: 0, 
-            energy: 1000, maxEnergy: 1000, 
-            dep: 0, bankLvl: 1, exp: 0, lvl: 1,
-            lastTime: Date.now(),
-            biz: [
-                {id:0, name:"Coffee Point", cost:50, profit:1, lv:0, icon:"☕"},
-                {id:1, name:"Cyber Club", cost:500, profit:12, lv:0, icon:"🌐"},
-                {id:2, name:"AI Startup", cost:5000, profit:90, lv:0, icon:"🤖"},
-                {id:3, name:"Crypto Farm", cost:50000, profit:750, lv:0, icon:"⛏️"},
-                {id:4, name:"Rocket Corp", cost:250000, profit:4200, lv:0, icon:"🚀"}
-            ],
-            stocks: [
-                {id:0, name:"TON", price:5.4, owned:0},
-                {id:1, name:"BTC", price:64000, owned:0},
-                {id:2, name:"NVDA", price:120, owned:0},
-                {id:3, name:"GOLD", price:2300, owned:0}
-            ]
-        };
+// === UI UPDATE ===
+function calculateIncome(){return state.biz.reduce((a,b)=>a+b.lv*b.profit,0);}
+function updateUI(){
+document.getElementById("bal-txt").innerText=Math.floor(state.bal).toLocaleString();
+document.getElementById("dep-txt").innerText=Math.floor(state.dep).toLocaleString();
+document.getElementById("inc-txt").innerText=calculateIncome().toLocaleString();
+document.getElementById("energy-num").innerText=Math.floor(state.energy);
+document.getElementById("max-energy-num").innerText=state.maxEnergy;
+document.getElementById("energy-bar").style.width=(state.energy/state.maxEnergy*100)+"%";
+document.getElementById("stones-txt").innerText=state.stones;
+document.getElementById("pwr-txt").innerText=1+state.lvl;
+document.getElementById("lvl-txt").innerText=state.lvl;
+document.getElementById("exp-val").innerText=Math.floor(state.exp);
+document.getElementById("exp-next").innerText=state.lvl*150;
+document.getElementById("bank-lvl-txt").innerText=state.bankLvl;
+document.getElementById("bank-rate-txt").innerText=(0.01+state.bankLvl*0.01).toFixed(2);
+document.getElementById("bank-up-cost").innerText=(state.bankLvl*5000).toLocaleString();
+updateRank();
+renderBiz();
+renderStocks();
+}
 
-        function saveGame() {
-            state.lastTime = Date.now();
-            localStorage.setItem('lp_save_v3_final', JSON.stringify(state));
-        }
+function updateRank(){
+let currentRank=RANKS[0],nextRank=RANKS[1];
+for(let i=0;i<RANKS.length;i++){if(state.totalEarned>=RANKS[i].min){currentRank=RANKS[i];nextRank=RANKS[i+1]||RANKS[i];}}
+document.getElementById("rank-icon").innerText=currentRank.icon;
+document.getElementById("rank-name").innerText=currentRank.name;
+document.getElementById("rank-curr-val").innerText="$"+Math.floor(state.totalEarned).toLocaleString();
+if(nextRank!==currentRank){
+let prog=((state.totalEarned-currentRank.min)/(nextRank.min-currentRank.min))*100;
+document.getElementById("rank-progress").style.width=Math.min(100,prog)+"%";
+document.getElementById("rank-next-name").innerText="Next: "+nextRank.name;
+}else{document.getElementById("rank-progress").style.width="100%";document.getElementById("rank-next-name").innerText="MAX RANK";}
+}
 
-        function loadGame() {
-            const saved = localStorage.getItem('lp_save_v3_final');
-            if(saved) {
-                const loaded = JSON.parse(saved);
-                state = {...state, ...loaded};
-                
-                // Автономный расчет прибыли
-                const now = Date.now();
-                const diff = Math.floor((now - state.lastTime) / 1000); // секунд отсутствия
-                
-                if (diff > 0) {
-                    const passiveSec = calculateIncome();
-                    const offlineMoney = passiveSec * diff;
-                    
-                    // Банковский доход (упрощенно за период)
-                    const bankRate = (0.0001 + state.bankLvl * 0.0001) * 10; // за секунду
-                    const offlineBank = state.dep * bankRate * diff;
+// === BUSINESS ===
+function renderBiz(){document.getElementById("biz-list").innerHTML=state.biz.map(b=>`<div class="item-row" onclick="buyBiz(${b.id})" style="opacity:${state.bal>=b.cost?1:0.6}"><div style="font-size:32px;">${b.icon}</div><div style="flex:1"><div style="font-weight:bold;">${b.name}</div><div style="font-size:11px;opacity:0.6;">+$${b.profit}/s • Lvl ${b.lv}</div></div><div style="text-align:right"><div style="color:var(--gold);font-weight:bold;">$${b.cost>1000000?(b.cost/1000000).toFixed(1)+'M':b.cost.toLocaleString()}</div></div></div>`).join("");}
+function buyBiz(id){let b=state.biz[id];if(state.bal>=b.cost){state.bal-=b.cost;b.lv++;b.cost=Math.floor(b.cost*1.6);state.exp+=b.profit*2;if(tg)tg.HapticFeedback.notificationOccurred("success");updateUI();saveGame();}}
 
-                    state.bal += offlineMoney;
-                    state.dep += offlineBank;
-                    state.totalEarned += (offlineMoney + offlineBank);
-                    
-                    // Регенерация энергии
-                    const regen = (0.4 + state.lvl/10) * 10 * diff;
-                    state.energy = Math.min(state.maxEnergy, state.energy + regen);
+// === STOCKS ===
+function renderStocks(){document.getElementById("stock-list").innerHTML=state.stocks.map(s=>`<div class="item-row"><div style="flex:1"><div style="font-weight:bold;">${s.name}</div><div style="font-size:11px;opacity:0.6;">Price: $${s.price.toLocaleString()} • Owned: ${s.owned}</div></div></div>`).join("");}
 
-                    if(offlineMoney > 1) {
-                        setTimeout(() => {
-                            tg.showAlert(`Welcome back!\nPassive earnings: $${Math.floor(offlineMoney + offlineBank).toLocaleString()}`);
-                        }, 1000);
-                    }
-                }
-            }
-        }
+// === BANK ===
+function bankAction(type){if(type==="dep"){state.dep+=state.bal;state.bal=0;}else{state.bal+=state.dep;state.dep=0;}updateUI();saveGame();}
+function upgradeBank(){let cost=state.bankLvl*5000;if(state.bal>=cost){state.bal-=cost;state.bankLvl++;updateUI();saveGame();}}
 
-        function calculateIncome() { return state.biz.reduce((a, b) => a + (b.lv * b.profit), 0); }
+// === CASINO ===
+function playCasino(choice){
+let amt=parseFloat(document.getElementById("bet-amt").value);
+if(isNaN(amt)||amt<=0||amt>state.bal){if(tg)tg.HapticFeedback.notificationOccurred("error");return;}
+state.bal-=amt;
+document.getElementById("casino-res").innerText="🎲";
+setTimeout(()=>{
+const redWin=Math.random()>0.52;
+const win=(choice==="red"&&redWin)||(choice==="black"&&!redWin);
+document.getElementById("casino-res").innerText=redWin?"🔴":"⚫";
+if(win){state.bal+=amt*2;state.totalEarned+=amt;if(tg)tg.HapticFeedback.notificationOccurred("success");}else{if(tg)tg.HapticFeedback.notificationOccurred("warning");}
+updateUI();saveGame();
+},600);
+}
 
-        function updateUI() {
-            document.getElementById('bal-txt').innerText = Math.floor(state.bal).toLocaleString();
-            document.getElementById('dep-txt').innerText = Math.floor(state.dep).toLocaleString();
-            document.getElementById('inc-txt').innerText = calculateIncome().toLocaleString();
-            document.getElementById('energy-num').innerText = Math.floor(state.energy);
-            document.getElementById('max-energy-num').innerText = state.maxEnergy;
-            document.getElementById('energy-bar').style.width = (state.energy/state.maxEnergy*100)+'%';
-            document.getElementById('stones-txt').innerText = state.stones;
-            document.getElementById('pwr-txt').innerText = (1 + state.lvl);
-            document.getElementById('lvl-txt').innerText = state.lvl;
-            document.getElementById('exp-val').innerText = Math.floor(state.exp);
-            document.getElementById('exp-next').innerText = state.lvl * 150;
-            
-            document.getElementById('bank-lvl-txt').innerText = state.bankLvl;
-            document.getElementById('bank-rate-txt').innerText = (0.01 + state.bankLvl * 0.01).toFixed(2);
-            document.getElementById('bank-up-cost').innerText = (state.bankLvl * 5000).toLocaleString();
+// === PRESTIGE ===
+function prestige(){
+if(state.lvl<50){if(tg)tg.showAlert("Reach level 50 to unlock Prestige!");return;}
+const stones=Math.floor(state.totalEarned/100000);
+state.stones+=stones;state.bal=100;state.dep=0;state.totalEarned=100;state.lvl=1;state.exp=0;state.energy=1000;state.maxEnergy=1000;state.bankLvl=1;state.biz.forEach(b=>{b.lv=0;b.cost=b.id===0?50:b.id===1?500:b.id===2?5000:b.id===3?50000:250000;});state.stocks.forEach(s=>{s.owned=0;});updateUI();saveGame();if(tg)tg.showAlert(`Prestige complete! You earned ${stones} stones.`);}
+}
 
-            updateRank();
-            renderBiz();
-            renderStocks();
-        }
+// === TABS ===
+function switchTab(id,el){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.getElementById("sc-"+id).classList.add("active");el.classList.add("active");if(tg)tg.HapticFeedback.impactOccurred("light");}
 
-        function updateRank() {
-            let currentRank = RANKS[0];
-            let nextRank = RANKS[1];
-            for (let i = 0; i < RANKS.length; i++) {
-                if (state.totalEarned >= RANKS[i].min) {
-                    currentRank = RANKS[i];
-                    nextRank = RANKS[i+1] || RANKS[i];
-                }
-            }
-            document.getElementById('rank-icon').innerText = currentRank.icon;
-            document.getElementById('rank-name').innerText = currentRank.name;
-            document.getElementById('rank-curr-val').innerText = "$" + Math.floor(state.totalEarned).toLocaleString();
-            
-            if (nextRank !== currentRank) {
-                let prog = ((state.totalEarned - currentRank.min) / (nextRank.min - currentRank.min)) * 100;
-                document.getElementById('rank-progress').style.width = Math.min(100, prog) + '%';
-                document.getElementById('rank-next-name').innerText = "Next: " + nextRank.name;
-            } else {
-                document.getElementById('rank-progress').style.width = '100%';
-                document.getElementById('rank-next-name').innerText = "MAX RANK";
-            }
-        }
+// === TAP ===
+function handleTap(e){state.bal+=1+state.lvl;state.totalEarned+=1+state.lvl;state.exp+=1+state.lvl;updateUI();saveGame();}
 
-        function handleTap(e) {
-            if(state.energy < 1) { tg.HapticFeedback.notificationOccurred('error'); return; }
-            let pwr = 1 + state.lvl;
-            state.bal += pwr;
-            state.totalEarned += pwr;
-            state.energy -= 1;
-            state.exp += 0.5;
-            
-            if(state.exp >= (state.lvl * 150)) {
-                state.exp = 0; state.lvl++;
-                state.maxEnergy += 200; state.energy = state.maxEnergy;
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-            
-            showFloatingText(e.clientX, e.clientY, `+$${pwr}`);
-            tg.HapticFeedback.impactOccurred('light');
-            updateUI();
-        }
-
-        function bankAction(type) {
-            if(type === 'dep') { state.dep += state.bal; state.bal = 0; }
-            else { state.bal += state.dep; state.dep = 0; }
-            tg.HapticFeedback.impactOccurred('medium');
-            updateUI();
-            saveGame();
-        }
-
-        function upgradeBank() {
-            let cost = state.bankLvl * 5000;
-            if(state.bal >= cost) {
-                state.bal -= cost;
-                state.bankLvl++;
-                tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
-                saveGame();
-            }
-        }
-
-        function renderBiz() {
-            document.getElementById('biz-list').innerHTML = state.biz.map(b => `
-                <div class="item-row" onclick="buyBiz(${b.id})" style="opacity: ${state.bal >= b.cost ? 1 : 0.6}">
-                    <div style="font-size:32px;">${b.icon}</div>
-                    <div style="flex:1">
-                        <div style="font-weight:bold;">${b.name}</div>
-                        <div style="font-size:11px; opacity:0.6;">+$${b.profit}/s • Lvl ${b.lv}</div>
-                    </div>
-                    <div style="text-align:right">
-                        <div style="color:var(--gold); font-weight:bold;">$${b.cost > 1000000 ? (b.cost/1000000).toFixed(1)+'M' : b.cost.toLocaleString()}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function buyBiz(id) {
-            let b = state.biz[id];
-            if(state.bal >= b.cost) {
-                state.bal -= b.cost;
-                b.lv++;
-                b.cost = Math.floor(b.cost * 1.6);
-                state.exp += (b.profit * 2);
-                tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
-                saveGame();
-            }
-        }
-
-        function renderStocks() {
-            document.getElementById('stock-list').innerHTML = state.stocks.map(s => `
-                <div class="item-row">
-                    <div style="flex:1">
-                        <div style="font-weight:bold;">${s.name}</div>
-                        <div style="font-size:10px; opacity:0.6;">Owned: ${s.owned}</div>
-                    </div>
-                    <div style="text-align:center; color:var(--accent); font-weight:bold; margin-right: 15px;">$${s.price.toFixed(2)}</div>
-                    <div style="display:flex; gap:8px;">
-                        <button onclick="trade(${s.id}, 'buy')" class="btn-action" style="padding:6px 12px; font-size:10px; background:var(--green)">BUY</button>
-                        <button onclick="trade(${s.id}, 'sell')" class="btn-action" style="padding:6px 12px; font-size:10px; background:var(--red)">SELL</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function trade(id, type) {
-            let s = state.stocks[id];
-            if(type === 'buy' && state.bal >= s.price) { state.bal -= s.price; s.owned++; }
-            else if(type === 'sell' && s.owned > 0) { state.bal += s.price; s.owned--; }
-            updateUI();
-            saveGame();
-        }
-
-        function playCasino(choice) {
-            let amt = parseFloat(document.getElementById('bet-amt').value);
-            if(isNaN(amt) || amt <= 0 || amt > state.bal) { tg.HapticFeedback.notificationOccurred('error'); return; }
-            state.bal -= amt;
-            let el = document.getElementById('casino-res');
-            el.innerText = '🎲';
-            setTimeout(() => {
-                let isRed = Math.random() > 0.52;
-                let win = (choice === 'red' && isRed) || (choice === 'black' && !isRed);
-                el.innerText = isRed ? '🔴' : '⚫';
-                if(win) {
-                    state.bal += amt * 2; state.totalEarned += amt;
-                    tg.HapticFeedback.notificationOccurred('success');
-                } else { tg.HapticFeedback.notificationOccurred('warning'); }
-                updateUI();
-                saveGame();
-            }, 600);
-        }
-
-        function showFloatingText(x, y, text) {
-            const p = document.createElement('div');
-            p.style.cssText = `position:fixed; color:var(--accent); font-weight:900; pointer-events:none; z-index:9999; left:${x}px; top:${y}px; animation: floatUp 0.8s forwards; font-size: 20px;`;
-            p.innerText = text;
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-        }
-
-        function switchTab(id, el) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('sc-'+id).classList.add('active');
-            el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
-        }
-
-        // --- CORE LOOPS ---
-
-        // 1. Пассивный доход (10 раз в секунду для плавности)
-        setInterval(() => {
-            let income = calculateIncome() / 10;
-            state.bal += income;
-            state.totalEarned += income;
-
-            if(state.dep > 0) {
-                let interest = state.dep * ((0.0001 + state.bankLvl * 0.0001));
-                state.dep += interest;
-                state.totalEarned += interest;
-            }
-
-            if(state.energy < state.maxEnergy) {
-                state.energy = Math.min(state.maxEnergy, state.energy + (0.4 + state.lvl/10));
-            }
-            updateUI();
-        }, 100);
-
-        // 2. Рынок акций и Автосохранение (каждые 5 секунд)
-        setInterval(() => {
-            state.stocks.forEach(s => {
-                s.price *= (1 + (Math.random() * 0.14 - 0.07));
-                if(s.price < 0.5) s.price = 0.5;
-            });
-            saveGame();
-        }, 5000);
-
-        // 3. Загрузка
-        window.onload = () => {
-            loadGame();
-            let p = 0;
-            const interval = setInterval(() => {
-                p += 20;
-                document.getElementById('loader-fill').style.width = p + '%';
-                if(p >= 100) {
-                    clearInterval(interval);
-                    document.getElementById('loader').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('loader').style.display = 'none';
-                        document.getElementById('app').style.display = 'flex';
-                        updateUI();
-                    }, 500);
-                }
-            }, 150);
-        };
-
-        // Сохранение при сворачивании
-        window.onblur = saveGame;
-    </script>
+// === INIT ===
+loadGame();updateUI();
+document.getElementById("loader-fill").style.width="100%";
+setTimeout(()=>{document.getElementById("loader").style.display="none";document.getElementById("app").style.display="flex";},500);
+</script>
 </body>
 </html>
